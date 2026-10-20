@@ -4,19 +4,26 @@ A declarative metric abstraction over OpenTelemetry for Python. Define metrics a
 
 ## Installation
 
-Install the dependencies (from `metric_utils_agent/`):
+**From the monorepo** (editable, recommended for development):
 
 ```bash
-pip install -r requirements.txt
+# From the repo root — installs all packages including metrics_utils
+uv sync
 ```
 
-Required packages:
+**From GitHub** (for use in a consumer project):
+
+```bash
+pip install "metrics-utils @ git+https://github.com/your-org/agentic-marketplace-commons.git#subdirectory=packages/metrics_utils"
+```
+
+Dependencies installed automatically:
 
 - `opentelemetry-api`
 - `opentelemetry-sdk`
 - `opentelemetry-exporter-prometheus`
 - `prometheus-client`
-- `opentelemetry-exporter-otlp-proto-http` (optional, for OTLP export)
+- `opentelemetry-exporter-otlp-proto-http` (OTLP HTTP export)
 
 ## Quick Start
 
@@ -32,7 +39,15 @@ provider = MetricsProvider(
     exporters=[
         ExporterConfig(exporter_type=ExporterType.PROMETHEUS, port=9464),
     ],
+    resource_attributes={"deployment.environment": "production"},
 )
+
+# Optional: register custom histogram buckets before starting
+provider.register_histogram_boundaries(
+    "http_request_duration_seconds",
+    (0.01, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0),
+)
+
 provider.start()
 ```
 
@@ -197,6 +212,30 @@ llm_histogram = MetricConfig(
     description="LLM call latency by model",
 )
 ```
+
+## MetricsProvider Reference
+
+### Constructor parameters
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `service_name` | `str` | `"unknown_service"` | Identifies the service in exported metrics (`service.name` resource attribute) |
+| `exporters` | `list[ExporterConfig]` | Prometheus on port `9464` | One or more exporter configurations |
+| `resource_attributes` | `dict[str, str]` | `{}` | Extra OTel resource attributes (e.g. `{"deployment.environment": "production"}`) |
+
+### `register_histogram_boundaries(name, boundaries)`
+
+Register custom bucket boundaries for a named histogram instrument. Must be called **before** `provider.start()`.
+
+```python
+provider.register_histogram_boundaries(
+    "llm_duration_seconds",
+    (0.1, 0.25, 0.5, 0.75, 1.0, 2.5, 5.0, 10.0),
+)
+provider.start()
+```
+
+> **Note:** bucket boundaries can also be set inline on a `MetricConfig` via `bucket_boundaries=`. If both are provided, the `MetricConfig` value takes precedence for that instrument.
 
 ## Exporters
 

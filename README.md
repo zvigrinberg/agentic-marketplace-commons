@@ -67,12 +67,23 @@ agentic-marketplace-commons/
     ├── metrics_utils/          # Installable package: metrics-utils
     │   ├── pyproject.toml
     │   ├── README.md
-    │   └── metrics_utils/      # Importable Python package
-    │       └── ...
+    │   ├── metrics_utils/      # Importable Python package
+    │   │   └── ...
+    │   └── examples/           # Runnable demos + Docker Compose stack
+    │       ├── sample_client.py
+    │       ├── Dockerfile
+    │       ├── docker-compose.yml
+    │       └── prometheus.yml
     └── tracer_utils/           # Installable package: tracer-utils
         ├── pyproject.toml
         ├── README.md
-        └── tracer_utils/       # Importable Python package
+        ├── tracer_utils/       # Importable Python package
+        │   └── ...
+        ├── examples/           # Runnable demos
+        │   └── open_inference_langchain_demo.py
+        ├── docker/             # Docker Compose stack for tracing backends
+        │   └── docker-compose.yml
+        └── tests/
             └── ...
 ```
 

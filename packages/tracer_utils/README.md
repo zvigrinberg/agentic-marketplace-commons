@@ -14,10 +14,24 @@ Extracted from, and functionally equivalent to, `traces/otel_setup.py` + `traces
 | `SpanHandle` | Returned by `tracer.start_span(...)` and `tracer.get_current_span()`; carries the raw span plus a LangChain config for nested `invoke()` calls. Provides `set_attribute()`, `set_attributes()`, `set_input()`, and `set_output()` convenience methods. |
 | `MlflowConfig` / `LangfuseConfig` | Optional explicit destination settings. Omit them to fall back to env vars. |
 
+## Installation
+
+**From the monorepo** (editable, recommended for development):
+
+```bash
+# From the repo root — installs all packages including tracer_utils
+uv sync
+```
+
+**From GitHub** (for use in a consumer project):
+
+```bash
+pip install "tracer-utils @ git+https://github.com/your-org/agentic-marketplace-commons.git#subdirectory=packages/tracer_utils"
+```
+
 ## Prerequisites
 
-- Dependencies from the project root `requirements.txt` (`mlflow`, `opentelemetry-exporter-otlp-proto-http`, `openinference-instrumentation-langchain`, `langfuse`, `langchain`, ...) installed in the project venv.
-- Run scripts **from the project root**, as a sibling file to this package (e.g. anything under `tracer_utils_agent/`), so `from tracer_utils import ...` resolves via the script's own directory on `sys.path` -- no extra packaging needed.
+- `tracer_utils` installed (see above).
 - For a live run (not just construction/shutdown): Ollama running with a pulled model, and whichever destinations you enable:
   - **MLflow**: `docker compose -f packages/tracer_utils/docker/docker-compose.yml up -d` (UI at `http://localhost:5000`)
   - **Langfuse**: `LANGFUSE_PUBLIC_KEY` / `LANGFUSE_SECRET_KEY` / `LANGFUSE_BASE_URL` set in the project `.env`
@@ -47,10 +61,10 @@ finally:
     tracer.shutdown()  # flush spans to MLflow + Langfuse and close the provider
 ```
 
-Save this as a script under `tracer_utils_agent/` (next to this package) and run it from the project root:
+Run from the repo root (after `uv sync`):
 
 ```bash
-python tracer_utils_agent/your_script.py
+uv run python your_script.py
 ```
 
 You should see the call show up as a `ChatOllama` span in both the MLflow experiment and the Langfuse project configured via your env vars.
@@ -82,7 +96,7 @@ def my_step(input_str: str, config: RunnableConfig) -> str:
 ```
 
 For a complete, runnable example with LLM calls, tool calls, LangGraph, async tools, and manual spans, see
-[`tracer_utils_agent/open_inference_automatic_framework_instrumentors.py`](../open_inference_automatic_framework_instrumentors.py).
+[`examples/open_inference_langchain_demo.py`](examples/open_inference_langchain_demo.py).
 
 ## Span attributes
 
@@ -167,5 +181,5 @@ tracer_utils/
 
 ## See also
 
-- Structural, no-live-backend smoke test: [`tracer_utils_agent/smoke_test.py`](../smoke_test.py)
-- Full live demo agent: [`tracer_utils_agent/open_inference_automatic_framework_instrumentors.py`](../open_inference_automatic_framework_instrumentors.py)
+- Structural, no-live-backend smoke test: [`tests/test_smoke.py`](tests/test_smoke.py)
+- Full live demo with LLM calls, tool calls, LangGraph, async tools, and manual spans: [`examples/open_inference_langchain_demo.py`](examples/open_inference_langchain_demo.py)
