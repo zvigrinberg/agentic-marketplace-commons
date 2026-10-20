@@ -1,0 +1,12 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: metric_utils_client
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - metrics-client:9464
+        labels:
+          service: metric_utils_sample

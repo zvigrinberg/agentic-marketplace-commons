@@ -308,10 +308,10 @@ if __name__ == "__main__":
 
 ## Running with Docker
 
-From the `metric_utils_agent/` directory:
+A ready-made Docker Compose stack lives in `examples/`. Run it from the **repo root**:
 
 ```bash
-docker compose up --build
+docker compose -f packages/metrics_utils/examples/docker-compose.yml up --build
 ```
 
 This starts three services:
@@ -323,3 +323,5 @@ This starts three services:
 | Grafana | `http://localhost:3001` |
 
 Grafana login: **admin** / **admin**. The Prometheus datasource is auto-provisioned.
+
+The stack installs `metrics_utils` directly from the package source (no separate `requirements.txt` needed) and runs [`examples/sample_client.py`](examples/sample_client.py).

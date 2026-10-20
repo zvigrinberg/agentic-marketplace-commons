@@ -4,8 +4,16 @@ Prerequisites:
   1. This package installed: uv sync  (from the repo root)
   2. (Optional) Prometheus scraping http://localhost:9464/metrics
 
-Run from the repo root:
+Run from the repo root (standalone):
     uv run python packages/metrics_utils/examples/sample_client.py
+
+Run the full observability stack (Prometheus + Grafana) via Docker Compose:
+    docker compose -f packages/metrics_utils/examples/docker-compose.yml up --build
+
+Services exposed by Docker Compose:
+  - Sample client (Prometheus scrape): http://localhost:9464/metrics
+  - Prometheus:                        http://localhost:9091
+  - Grafana (admin/admin):             http://localhost:3001
 
 Metrics will be exposed at http://localhost:9464/metrics for Prometheus scraping.
 """
