@@ -19,7 +19,7 @@ Extracted from, and functionally equivalent to, `traces/otel_setup.py` + `traces
 - Dependencies from the project root `requirements.txt` (`mlflow`, `opentelemetry-exporter-otlp-proto-http`, `openinference-instrumentation-langchain`, `langfuse`, `langchain`, ...) installed in the project venv.
 - Run scripts **from the project root**, as a sibling file to this package (e.g. anything under `tracer_utils_agent/`), so `from tracer_utils import ...` resolves via the script's own directory on `sys.path` -- no extra packaging needed.
 - For a live run (not just construction/shutdown): Ollama running with a pulled model, and whichever destinations you enable:
-  - **MLflow**: `docker compose -f traces/docker-compose.yml up -d` (UI at `http://localhost:5000`)
+  - **MLflow**: `docker compose -f packages/tracer_utils/docker/docker-compose.yml up -d` (UI at `http://localhost:5000`)
   - **Langfuse**: `LANGFUSE_PUBLIC_KEY` / `LANGFUSE_SECRET_KEY` / `LANGFUSE_BASE_URL` set in the project `.env`
 
 ## Quick start -- trace a simple LLM call to both MLflow and Langfuse

@@ -9,7 +9,8 @@ Hierarchy (one trace when ``main_agent`` is invoked):
 
 Prerequisites:
   1. Ollama running with gemma3:270m pulled
-  2. MLflow: docker compose -f <your-infra-repo>/docker-compose.yml up -d
+  2. MLflow: docker compose -f packages/tracer_utils/docker/docker-compose.yml up -d
+     UI at http://localhost:5000
   3. (Optional) Langfuse: set LANGFUSE_PUBLIC_KEY / LANGFUSE_SECRET_KEY / LANGFUSE_BASE_URL
   4. A .env file in the project root (or env vars exported in your shell)
   5. This package installed: uv sync  (from the repo root)
@@ -34,18 +35,22 @@ load_dotenv(Path(__file__).resolve().parents[3] / ".env")
 from tracer_utils import Tracer, TracerDestination, TracerSdk
 
 ## configuration for mlflow as backend
-# tracer = Tracer(
-#     sdk=TracerSdk.OPEN_INFERENCE,
-#     destinations=TracerDestination.MLFLOW,
-#     service_name="traces-open-inference",
-# )
-
-# configuration for mlflow + langfuse
 tracer = Tracer(
     sdk=TracerSdk.OPEN_INFERENCE,
-    destinations=[TracerDestination.MLFLOW, TracerDestination.LANGFUSE],
+    destinations=TracerDestination.MLFLOW,
     service_name="traces-open-inference",
 )
+
+# When using langfuse, make sure to include below env in .env file
+# LANGFUSE_SECRET_KEY=
+# LANGFUSE_PUBLIC_KEY=
+# LANGFUSE_BASE_URL=, e.g: http://localhost:3000
+# # configuration for mlflow + langfuse
+# tracer = Tracer(
+#     sdk=TracerSdk.OPEN_INFERENCE,
+#     destinations=[TracerDestination.MLFLOW, TracerDestination.LANGFUSE],
+#     service_name="traces-open-inference",
+# )
 
 ## configuration for langfuse only
 # tracer = Tracer(

@@ -4,8 +4,17 @@ version = "0.1.0"
 description = "Monorepo workspace for shared agentic-marketplace Python packages"
 readme = "README.md"
 requires-python = ">=3.12"
+dependencies = [
+    "tracer-utils",
+    "metrics-utils",
+]
 
 # This root project is NOT published. It exists only to configure the uv workspace.
 # Individual publishable packages live under packages/.
 [tool.uv.workspace]
 members = ["packages/*"]
+
+[tool.uv.sources]
+tracer-utils = { workspace = true }
+metrics-utils = { workspace = true }
+

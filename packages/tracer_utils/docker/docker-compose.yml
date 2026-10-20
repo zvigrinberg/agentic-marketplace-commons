@@ -1,0 +1,38 @@
+# MLflow tracking server with OTLP trace ingestion (MLflow 3.6+).
+# UI: http://localhost:5000
+# OTLP HTTP endpoint for the agent: http://localhost:5000/v1/traces
+#
+# Start: docker compose -f traces/docker-compose.yml up -d
+# Stop:  docker compose -f traces/docker-compose.yml down
+
+services:
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v3.6.0
+    container_name: traces-mlflow
+    ports:
+      - "5000:5000"
+    volumes:
+      - mlflow_data:/mlflow
+    command:
+      - mlflow
+      - server
+      - --host=0.0.0.0
+      - --port=5000
+      - --backend-store-uri=sqlite:///mlflow/mlflow.db
+      - --default-artifact-root=/mlflow/artifacts
+      - --serve-artifacts
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/', timeout=5)",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 40s
+
+volumes:
+  mlflow_data:
