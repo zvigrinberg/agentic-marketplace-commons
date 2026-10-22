@@ -80,12 +80,40 @@ agentic-marketplace-commons/
         ├── tracer_utils/       # Importable Python package
         │   └── ...
         ├── examples/           # Runnable demos
-        │   └── open_inference_langchain_demo.py
+        │   ├── open_inference_langchain_demo.py  # LangChain/LangGraph + Ollama, manual spans
+        │   ├── primary_agent.py                  # FastAPI primary agent (port 8888)
+        │   └── sub_agent.py                      # FastAPI sub-agent (port 9999); W3C traceparent — spans on same MLflow trace as primary, nested under its parent trace/span IDs
         ├── docker/             # Docker Compose stack for tracing backends
         │   └── docker-compose.yml
         └── tests/
             └── ...
 ```
+
+## tracer_utils examples
+
+Package-level API and setup are documented in [`packages/tracer_utils/README.md`](packages/tracer_utils/README.md).
+
+| Example | What it demonstrates |
+|---|---|
+| [`open_inference_langchain_demo.py`](packages/tracer_utils/examples/open_inference_langchain_demo.py) | OpenInference auto-instrumentation, LLM/tool/LangGraph flows, manual spans, MLflow (optional Langfuse). Requires Ollama + MLflow (see that file’s docstring). |
+| [`primary_agent.py`](packages/tracer_utils/examples/primary_agent.py) + [`sub_agent.py`](packages/tracer_utils/examples/sub_agent.py) | Two FastAPI services: the primary agent runs a LangGraph tool that calls the sub-agent over HTTP with a W3C `traceparent` header so spans from the sub-agent attach to the same trace in MLflow. |
+
+**Distributed tracing demo (primary + sub-agent)**
+
+Prerequisites: `uv sync`, MLflow up (`docker compose -f packages/tracer_utils/docker/docker-compose.yml up -d`), and a root `.env` if you use Langfuse or custom MLflow settings.
+
+```bash
+# Terminal 1 — sub-agent on :9999
+uv run python packages/tracer_utils/examples/sub_agent.py
+
+# Terminal 2 — primary agent on :8888
+uv run python packages/tracer_utils/examples/primary_agent.py
+
+# Terminal 3 — trigger the flow (primary calls sub-agent from inside its LangGraph tool)
+curl -X POST http://localhost:8888/first -H "Content-Type: application/json" -d '{"hello":"world"}'
+```
+
+Check traces in the MLflow UI (`http://localhost:5000` by default).
 
 ## Adding a new package
 
